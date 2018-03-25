@@ -2,5 +2,28 @@
 
 \section{Tábla kommunikációs protokoll}
 \section{Ethernet protokoll}
+Két porton hallgat a MUEB, az egyiken parancsokat lehet neki adni, a másikon pedig animációkat fogad.
+\par
+Utasítás port: 3000
+\par
+Animáció port: 2000
+
+\subsection{Parancsok}
+\begin{enumerate}
+  \item 12V lekapcsolása <-- mátrix végén a csatlakozók nem lesznek feszültség alatt a leszereléskor
+  \item 12V bekapcsolása (a véletlen kikapcsolások esetére)
+  \item Reboot
+  \item Status lekérdezés
+  \item Beépített animáció indítása
+  \item Beépített animáció leállítása, ekkor az animációk portjára érkezett csomagok jelennek meg.
+\end{enumerate}
+\subsection{Parancs csomagok felépítése}
+A parancs első három bájtja az 'S', 'E' illetve 'M' karakterek ebben a sorrendben, az ezt követő első bájt az utasítás, majd ezt követik az utasítások esetleges argumentumai. 
+\subsection{Animáció csomagok felépítése}
+Az első bájt szabja meg, hogy melyik ablaknak, és melyik pixelnek szól a csomag. A bájt MSB-je mondja meg, hogy melyik ablak. Ha a bit be van állítva, akkor az kívülről nézve jobb oldali ablak, ha nincs beállítva, akkor kívülről nézve bal ablak. A bájt alsó bitjei határozzák meg a pixelt. Az alsó két bithatározza meg a pixelt. Kívülről nézve bal felső a 0, jobb felső az 1, bal alsó a 2, és jobb alsó a 3. Az első bájt nem használt bitjei 0-ra legyenek állítva. 
+\par
+A második bájt ábrázojl a pixel vörös komponensét, a harmadik bájt a zöld komponensét, a negyedik bájt a kéket. A skálán a 255 a legfényesebb, a 0 a teljesen kikapcsolt.
+\par
+A csomagban nem szereplő pixelek változatlan állpotban maradnak.
 \subsection{MAC cím}
 \section{LED-ek}
