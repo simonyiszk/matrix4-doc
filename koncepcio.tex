@@ -1,0 +1,24 @@
+\chapter{Koncepció}
+%TODO szószedet írni, pl MUEB szó feloladása
+
+A kitűzött cél a MUEB-ek minél nagyobb hibatűrés, és debugolhatósága. Ezen kívül a konfigurálást is minél inkább automatizálni kell.
+\par
+Ennek érdekében a következő célokat tűztük ki:
+\begin{enumerate}
+ \item Visszajelző LED-ek a MUEB-en. Az egyértelműség kedvéért legyen rászitázva a LED-ek mellé, hogy melyik mit csinál.
+ \item A MUEB automata azonosítsa be, hogy melyik szobában van, ne kelljen jumperelni.
+ \item Az áramkör legyen zavartűrő, és ne bocsásson ki magából zajt
+ \item Ne lehessen véletlen zárlatot csinálni a NYÁK-on
+ \item Ne lehessen elcsúsztatva bedugni a csatlakozókat
+ \item Egyértelmű legyen, hogy hova kell dugni a tápcsatlakozót
+ \item Ne legyen kritikus a kábelek csatlakoztatásának a sorrrendje.
+ \item Ergonómikus dobozban legyen
+ \item Az elkészült kódokat tároljuk könnyen azonosítható helyen, valamint készüljön hozzájuk jól érthető dokumentáció a jövőbeli változtatások megkönnyítése érdekében.
+ \item Szerver beüzemelése nélkül is lehessen animációt lejátszani a MUEB-en
+ \item A MUEB működése stabil legyen, az esetleges hibák pedig következetesek.
+ \item A MUEB illeszkedjen az SCHNET-hez, azon semmilyen módosítást ne kelljen végrehajtani az esemény idejére.
+\end{enumerate}
+Ami nem célunk:
+\begin{enumerate}
+ \item Más épületekbe hordozható hardver készítése
+\end{enumerate}
