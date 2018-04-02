@@ -1,0 +1,41 @@
+\chapter{A kijelzők vezérlőpanelje}
+
+\section{Koncepció}
+Egy kijelző 4 darab pixelt tartalmaz. A panel egy szalagkábelen keresztül csatlakozik a MUEB-hez, azzal UART-on ommunikálk.
+A két ablkot egy jumperelés konfigurálja ``ellentétes'' funkcióra.
+
+\subsection{Pixelek}
+Minden pixel 9 darab szubpixelből áll össze. A szubpixeleken belül három azanos színű LED van sorba kötve, majd ezek a blokkok párhuzamosan.
+%todo a táblán lévő ledek elhelyezkedése
+%todo szalagkábelcsati kiosztása
+%todo elosztó panel dokumentálása
+
+\section{Technikai specifikáció} %todo táblázat
+Baud rate: %todo
+\par
+V+: 12V
+%todo áramfelvétel
+\par
+Vcc: 3.3V
+%todo áramfelvétel
+
+\section{Kommunikációs protokoll}
+\begin{center}
+  \begin{tabular}{ c c }
+    Funkció & Küldendő byte \\ \hline \hline
+    OldalA panel kiválasztása & F0 \\ \hline
+    OldalB panel kiválasztása & F1 \\ \hline
+    Verzószám visszaüldése \par A felső hét bit a verzió, az alsó bit az ablak jumperelése & 1101xxxx \\ \hline
+    Mindkét ablak fázistolásának párhuzamos írása szubpixelekre vonatkoztatva burstösen & 1110xxxx, ahol xxxx a fázistolás mértéke  \\ \hline
+    Szubpixel fényerejének állítása a kiválasztott ablakon & xxxxyyyy, ahol xxxx  a szubpixel sorszáma, yyyy a fényerő \\ \hline
+  \end{tabular}
+\end{center}
+
+Javaslatok:
+\begin{enumerate}
+ \item Forráskódolás a kódszókon
+ \item 8 bites mélység
+\end{enumerate}
+
+\section{Szubpixelek számozása}
+%todo
