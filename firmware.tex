@@ -27,3 +27,29 @@ A második bájt ábrázojl a pixel vörös komponensét, a harmadik bájt a zö
 A csomagban nem szereplő pixelek változatlan állpotban maradnak.
 \subsection{MAC cím}
 \section{LED-ek}
+
+\section{Ablak automata}
+%\begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
+\begin{tikzpicture}[>=stealth',shorten >=2pt,auto,shorten <=2pt,node distance=5 cm,
+                    every state/.style={align=center,minimum size=3cm,text width=2cm},
+		    every edge/.style={draw,thick},
+		    loop label/.style={draw,align=center,text width=2cm,outer sep=4pt,minimum height=1cm}
+		   ]
+
+   \node[state,initial] (vcc_3v3_off)   {3.3V táp kikapcsolva}; 
+   \node[state] (vcc_3v3_on) [right=of vcc_3v3_off] {3.3V táp bekapcsolva, de még nincs sikeres kommunikáció}; 
+   \node[state] (vcc_12v_off) [below=of vcc_3v3_on] {12V-os táp kikapcsolva}; 
+   \node[state,accepting](vcc_12v_on) [left=of vcc_12v_off] {12V-os táp bekapcsolva};
+   \path[->] 
+          (vcc_3v3_off) edge  node {} (vcc_3v3_on)
+          (vcc_3v3_on) edge  node  {üdvözlő üzenet fogadva} (vcc_12v_on)
+	  (vcc_3v3_on) edge  node  {Timeout} (vcc_3v3_off)
+          (vcc_12v_on) edge  node  {Parancs} (vcc_12v_off)
+          (vcc_12v_off) edge  node  {Parancs} (vcc_12v_on);
+\end{tikzpicture}
+\par
+A MUEB 5 másodperc után bekapcsolja a PWM panel tápellátását, majd vár egy másodpercet az üdvözlőüzenet fogadására. Amennyiben ez nem történik meg, kikapcsolja a csatlakozón a 3.3V-os tápfeszültséget, és 5 másodperc után újra próbálkozik.
+\par
+Sikeres kommunikációt követően a MUEB bekapcsolja a 12V-ot a táblára. A 12V-ot hálózaton keresztül kapcsolhatjuk ki a megfelelő paranccsal, illetve ebből az állapotból vissza.
+\par
+Az állapotgép újraindítható szintén egy hálózat felől érkező paranccsal, ekkor a tápelltás megszűnése miatt a kijelző panel is újraindul.
