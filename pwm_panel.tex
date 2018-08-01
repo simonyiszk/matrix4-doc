@@ -2,7 +2,6 @@
 
 \section{Koncepció}
 Egy kijelző 4 darab pixelt tartalmaz. A panel egy szalagkábelen keresztül csatlakozik a MUEB-hez, azzal UART-on kommunikál.
-A két ablakot egy jumperelés konfigurálja "ellentétes" funkcióra.
 
 \subsection{Pixelek}
 Minden pixel 9 darab alpixelből áll össze. Az alpixeleken belül három azonos színű LED van sorba kötve, majd ezek a blokkok párhuzamosan.
@@ -11,7 +10,10 @@ Minden pixel 9 darab alpixelből áll össze. Az alpixeleken belül három azono
 %todo elosztó panel dokumentálása
 
 \section{Technikai specifikáció} %todo táblázat
-Baud rate: %todo
+\par
+Bitmélység: 3 bit/szín
+\par
+Baud rate: 125000
 \par
 V+: 12V
 %todo áramfelvétel
@@ -20,16 +22,33 @@ Vcc: 3.3V
 %todo áramfelvétel
 
 \section{Kommunikációs protokoll}
+
+MUEB $\rightarrow$ Panel
 \begin{center}
   \begin{tabularx}{\linewidth}{ L L }
     Funkció & Küldendő byte \\ \hline \hline
-    OldalA panel kiválasztása & F0 \\ \hline
-    OldalB panel kiválasztása & F1 \\ \hline
-    Verziószám visszaküldése \par A felső hét bit a verzió, az alsó bit az ablak jumperelése & 1101xxxx \\ \hline
-    Mindkét ablak fázistolásának párhuzamos \par írása alpixelekre vonatkoztatva burstösen & 1110xxxx, ahol xxxx a fázistolás mértéke  \\ \hline
-    Alpixel fényerejének állítása a kiválasztott ablakon & xxxxyyyy, ahol xxxx az alpixel sorszáma, yyyy a fényerő \\ \hline
+    Panel inicializálása & F0 \\ \hline
+    Mód lekérdezése & F5 \\ \hline
+    Belépés konfigurációs módba & E0\\ \hline
+    Konfigurációs módban a gamma lookup table megadása - színenként 8 szint & min (0\%): 0x00 - max (100\%): 0x40 \par
+                                                                                                                                sorrend: piros (8 bájt), zöld (8 bájt), kék (8 bájt) \\ \hline
+    Kilépés konfigurációs módból & F0 (a 24 elküldött bájt után automatikusan normál módba kerül) \\ \hline
+    Alpixel fényerejének állítása & 1 bájt: aaaaxbbb, ahol aaaa az alpixel sorszáma (0-11), bbb a fényerő (0-7), x figyelmen kívül hagyva (0-1) \\ \hline
   \end{tabularx}
 \end{center}
+\begin{minipage}{\textwidth}
+Panel $\rightarrow$ MUEB
+\begin{center}
+  \begin{tabularx}{\linewidth}{ L L }
+    Funkció & Küldendő adat \\ \hline \hline
+    Panel inicializálatlan állapotban & 0x55 (periodikusan) \\ \hline
+    Válasz inicializálás után & verzió pl. "v1.0" \\ \hline
+    Válasz mód lekérdezésre & 0x41 - inicializálatlan \par
+                                            0x42 - normál mód \par
+                                            0x42 - konfigurációs mód \\ \hline
+  \end{tabularx}
+\end{center}
+\end{minipage}
 
 Javaslatok:
 \begin{enumerate}
