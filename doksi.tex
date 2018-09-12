@@ -1,0 +1,99 @@
+\documentclass[a4paper,12pt]{article}
+\begin{document}
+
+\title{Mátrix 4 Status Backend Documentation}
+\author{Nagy Simon József}
+\date{\today}
+\maketitle
+
+Mátrix 4.0 Status Backend dokumentáció
+Készítette: Nagy Simon József
+\chapter{A program fordítása}
+
+A programot java nyelven írtam a 1.8 verzió szerint és a ’JavaSE-1.8’ fordítóval fordítottam a programot, melyhez az alábbi java könyvtárakat használtam fel melyekhez tartozó ’.jar’ fájlok a ’ReferencedLibraries’ nevű mappában találhatóak.
+•	JSON könyvtár, Json objektumok kezeléséhez, ’java-json.jar’
+•	GSON könyvtár, Json objektumok kezeléséhez,  ’gson-2.2.2.jar’
+Kommunikációs interface
+Programommal REST API segítségével lehet kommunikálni.
+\section{Status lekérdezés}
+A státuszt a ’/getstatus?HelloSem’ URL segítségével lehet lekérdezni. A GET parancsra a programom egy JSON objektumot küld el egyszerű szövegként ASCII kódolással.
+\section{A válaszobjektum}
+A válaszként küldött objektum legfontosabb része a ’container’ nevű kétdimenziós tömb (első az emelethez második a szobaszámhoz kapcsolódik) mely a Müeb státusz objektumokat tartalmazza.
+A Müeb objektumoknak 3 tagváltozójuk van.
+•	valid: a legutolsó kérésre jött-e válasz vagy TimeoutException-t kapott a program
+•	status: az adott müeb utolsó értelmes üzenete, kezdetben ’no data’
+•	timeoutCount: az utolsó válasz óta kapott timeout-ok száma, kezdetben 0, és természetesen ha nagyobb mint nulla akkor a valid változó biztosan hamis
+Ezen kívül a json objektumban két int típusú változó mely a tömb szélességét és magasságát (’width’ és ’height’) határozza meg. A szélesség alapértelmezésként 8 a magasság 13, ezek a tömb dimenzióit jelölik ki. Itt felmerül az indexeknek a szobákra történő leképezésének kérdése is. Az első dimenzió az emeletet jelöli ki i. indexhez a 6+i. emelet tartozik, míg a második dimenzió a szobaszám utolsó két számjegyét határozza meg. Tehát a j. indexhez az 5+j. szobaszám tartozik. 
+A következőkben egy példaválaszt láthatunk:
+{
+"container":[
+[
+{
+"valid":false,
+"timeoutCount":0,
+"status":"no data"
+},
+{
+"valid":false,
+"timeoutCount":0,
+"status":"no data"
+}
+],
+[
+{
+"valid":false,
+"timeoutCount":0,
+"status":"no data"
+},
+{
+"valid":false,
+"timeoutCount":0,
+"status":"no data"
+}
+],
+[
+{
+"valid":false,
+"timeoutCount":0,
+"status":"no data"
+},
+{
+"valid":false,
+"timeoutCount":0,
+"status":"no data"
+}
+]
+],
+"width":2,
+"height":3
+}
+
+\chapter{Program működése}
+
+\section{RestApiService osztály}
+
+Mint ahogy a neve is utal rá a RestApiService osztáy felel a begyűjtött adatok TCP/HTML protokollon keresztül való továbbításáért. Ennek a megvalósításához egy tankönyvi TCP szerver szolgál (természetesen némi módosítással), mely a „Thread” osztály leszármazottja és „void run(void)” függvénye felel a beérkező HTML kérések kiszolgálásáért, ahol jelenlegi megvalósítás mellett minden beérkező kérésre elküldi az aktuális JSON objektumot ASCII kódolásban. Konstruktorának nincs bemeneti paramétere, de használat előtt kötelező meghívni. Végül pedig fontos szót ejteni a „void setMuebArray(Muebarray ma)” működéséről is ugyanis ezen publikus tagfüggvény segítségével lehet kívülről beállítani az aktuálisan elküldendő MuebArray objektumot, mely a több szálra való tekintettel „volatile”.
+
+\section{Commander osztály}
+
+Kétség nélkül kijelenthetjük, hogy a Commander osztály a program egyik legfontosabb eleme ugyanis ez felel a Müeb moduloknak az UDP parancsok elküldéséért és a válaszok fogadásáért. Konstruktorában kötelező megadni a parancs típusát mely a későbbiekben nem változtatható. Ezt „String” formátumban kell megadni és a következőek lehetnek:
+•	12V-off-left
+•	12V-off-right
+•	reset-left-panel
+•	reset-right-panel
+•	reboot
+•	get-status
+•	use-internal-animation
+•	use-external-animation
+•	blank
+•	delete-anim-network-buffer
+•	ping
+Ezek után a Mueb kommunikációs protokollja szerit be lesz állítva az elküldött üzenetben az utasítást tároló, negyedik byte. Ezek után a „String toBytes()” publikus tagfüggvénnyel lehet az üzenetet byte tömb formájában lekérni, illetve az üzenetet a „String send(String ip)” tagfüggvénnyel lehet elküldeni a paraméterként megadott IP-re, mely a kapott válaszüzenettel tér vissza és hiba esetén kivételt dobhat. Ez adódhat az UDP csomagok sikertelen inicializálásából, vagy az 1000 ms-os válasz timeout túllépéséből is.
+
+\section{Main osztály}
+
+A main osztály felel az egész program összehangolásáért és tartalmazza a belépési pontot jelentő „main” tagfüggvényt is. Ezen függvényben egy rövid teszt után a program összes objektuma inicializáva lesz (egy Commander és egy RestApiService objektum) és utána megkezdődik végtelen ciklusban egy másodpercenként a régi MuebArray lekérése és a Mueb modulok státuszának a lekérdezése egy kettős (emelet és szoba) for ciklusban ahol minden egyes státusz lekérdezés után frissül a MuebArray objektum és az összes lekérdezés után át lesz adva a RestApiService objektumoknak.
+
+
+
+\end{document}
