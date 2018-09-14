@@ -10,20 +10,22 @@ Mátrix 4.0 Status Backend dokumentáció
 Készítette: Nagy Simon József
 \chapter{A program fordítása}
 
-A programot java nyelven írtam a 1.8 verzió szerint és a ’JavaSE-1.8’ fordítóval fordítottam a programot, melyhez az alábbi java könyvtárakat használtam fel melyekhez tartozó ’.jar’ fájlok a ’ReferencedLibraries’ nevű mappában találhatóak.
+A programot Java nyelven írtam a 1.8 verzió szerint és a ’JavaSE-1.8’ fordítóval fordítottam, melyhez az alábbi könyvtárakat használtam fel (a kapcsolódó .jar fájlok a ’ReferencedLibraries’ nevű mappában találhatóak):
 •	JSON könyvtár, Json objektumok kezeléséhez, ’java-json.jar’
 •	GSON könyvtár, Json objektumok kezeléséhez,  ’gson-2.2.2.jar’
 Kommunikációs interface
-Programommal REST API segítségével lehet kommunikálni.
+Programommal REST API-n keresztül lehet kommunikálni.
 \section{Status lekérdezés}
-A státuszt a ’/getstatus?HelloSem’ URL segítségével lehet lekérdezni. A GET parancsra a programom egy JSON objektumot küld el egyszerű szövegként ASCII kódolással.
+A státuszt a ’/getstatus?HelloSem’ URL segítségével lehet lekérdezni. A GET parancsra a program egy JSON objektumot küld el egyszerű szövegként ASCII kódolással.
 \section{A válaszobjektum}
-A válaszként küldött objektum legfontosabb része a ’container’ nevű kétdimenziós tömb (első az emelethez második a szobaszámhoz kapcsolódik) mely a Müeb státusz objektumokat tartalmazza.
+A válaszként küldött objektum legfontosabb része a ’container’ nevű kétdimenziós tömb (első dimenzió az emelethez, második a szobaszámhoz kapcsolódik) mely a Müeb státusz objektumokat tartalmazza.
 A Müeb objektumoknak 3 tagváltozójuk van.
 •	valid: a legutolsó kérésre jött-e válasz vagy TimeoutException-t kapott a program
 •	status: az adott müeb utolsó értelmes üzenete, kezdetben ’no data’
-•	timeoutCount: az utolsó válasz óta kapott timeout-ok száma, kezdetben 0, és természetesen ha nagyobb mint nulla akkor a valid változó biztosan hamis
-Ezen kívül a json objektumban két int típusú változó mely a tömb szélességét és magasságát (’width’ és ’height’) határozza meg. A szélesség alapértelmezésként 8 a magasság 13, ezek a tömb dimenzióit jelölik ki. Itt felmerül az indexeknek a szobákra történő leképezésének kérdése is. Az első dimenzió az emeletet jelöli ki i. indexhez a 6+i. emelet tartozik, míg a második dimenzió a szobaszám utolsó két számjegyét határozza meg. Tehát a j. indexhez az 5+j. szobaszám tartozik. 
+•	timeoutCount: az utolsó válasz óta kapott timeout-ok száma, kezdetben 0, és természetesen ha több, akkor a valid változó biztosan hamis
+
+Ezen kívül a JSON objektumban két int típusú változó mely a tömb szélességét és magasságát (’width’ és ’height’) határozza meg. A szélesség alapértelmezetten 8 a magasság 13. Itt felmerül az indexeknek a szobákra történő leképezésének kérdése is. Az első dimenzió az emeletet jelöli ki i. indexhez a 6+i. emelet tartozik, míg a második dimenzió a szobaszám utolsó két számjegyét határozza meg. Tehát a j. indexhez az 5+j. szobaszám tartozik. 
+
 A következőkben egy példaválaszt láthatunk:
 {
 "container":[
@@ -72,7 +74,7 @@ A következőkben egy példaválaszt láthatunk:
 
 \section{RestApiService osztály}
 
-Mint ahogy a neve is utal rá a RestApiService osztáy felel a begyűjtött adatok TCP/HTML protokollon keresztül való továbbításáért. Ennek a megvalósításához egy tankönyvi TCP szerver szolgál (természetesen némi módosítással), mely a „Thread” osztály leszármazottja és „void run(void)” függvénye felel a beérkező HTML kérések kiszolgálásáért, ahol jelenlegi megvalósítás mellett minden beérkező kérésre elküldi az aktuális JSON objektumot ASCII kódolásban. Konstruktorának nincs bemeneti paramétere, de használat előtt kötelező meghívni. Végül pedig fontos szót ejteni a „void setMuebArray(Muebarray ma)” működéséről is ugyanis ezen publikus tagfüggvény segítségével lehet kívülről beállítani az aktuálisan elküldendő MuebArray objektumot, mely a több szálra való tekintettel „volatile”.
+Mint ahogy a neve is utal rá a RestApiService osztáy felel a begyűjtött adatok TCP/HTTP protokollon keresztül való továbbításáért. Ennek a megvalósításához egy tankönyvi TCP szerver szolgál (természetesen némi módosítással), mely a „Thread” osztály leszármazottja és „void run(void)” függvénye felel a beérkező HTTP kérések kiszolgálásáért, ahol jelenlegi megvalósítás mellett minden beérkező kérésre elküldi az aktuális JSON objektumot ASCII kódolásban. Konstruktorának nincs bemeneti paramétere, de használat előtt kötelező meghívni. Végül pedig fontos szót ejteni a „void setMuebArray(Muebarray ma)” működéséről is ugyanis ezen publikus tagfüggvény segítségével lehet kívülről beállítani az aktuálisan elküldendő MuebArray objektumot, mely a több szálra való tekintettel „volatile”.
 
 \section{Commander osztály}
 
