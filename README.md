@@ -1,1 +1,9 @@
-# matrix4-doc
+Mátrix 4 technikai dokumentáció
+===============================
+
+## Fordítás
+
+```bash
+	make
+```
+
