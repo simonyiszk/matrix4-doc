@@ -53,3 +53,15 @@ A MUEB 5 másodperc után bekapcsolja a PWM panel tápellátását, majd vár eg
 Sikeres kommunikációt követően a MUEB bekapcsolja a 12V-ot a táblára. A 12V-ot hálózaton keresztül kapcsolhatjuk ki a megfelelő paranccsal, illetve ebből az állapotból vissza.
 \par
 Az állapotgép újraindítható szintén egy hálózat felől érkező paranccsal, ekkor a tápellátás megszűnése miatt a kijelző panel is újraindul.
+
+\section{Távoli firmware frissítés}
+
+\subsection{Elképzelés}
+A firmware passzentosan, de elfér a flash felében. Egy távoli firmware frissítés megvalósítható úgy, hogy hálózatról feltöltjük a flash második felét azzal a programmal, amit később futtatni szeretnénk, majd ezt átmásoljuk a flash első felébe. Az előbbi pont gond nélkül megoldható, utóbbi viszont elgondolkodtató, mivel figyelni kell arra, hogy a program ne törölje ki maga alól futás közben önnön magát. Erre megoldás az, hogy minden firmwareben ugyan azon a helyen elheyezünk egy firmware másoló rutint, ami úgy linkelünk, hogy a címek a memória végéhez igazodjanak. Azaz a frissítés közben a másolú rutin a flash második fleéből, azaz az új firmwareből fog futni. 
+
+
+\subsection{Megvalósítás} %TODO megírni jobbra
+Még le kell kódolni az egészet és megírni a mágikus linker sciprtet.
+
+\subsection{Interfész} %TODO pontosítani és implementálni
+A MUEB vezérlő portjár aki kell küldeni a parancsot, ami engedélyezi a firmware frissítést, ekkor kinyílik az 1997-es TCP port. Erre a portra elküldünk fél flash memória méretnyi adatot nyersen (nem S3, nem S2, nem intel HEX). Amikor végeztünk a küldéssel, akkor küldjük ki a parancsot a MUEB-nek, ami kiszámolja a flash második felének ellenőrzőösszegét. Ezt vessük össze a kívánttal, ha megegyezik, akkor adjuk ki a parancsot, ami átmásolja a flash második felét az elsőbe, majd reseteli a MUEB-et. Az újraindítás automatikusan megtörténik. 
